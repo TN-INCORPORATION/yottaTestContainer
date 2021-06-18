@@ -1,0 +1,30 @@
+version: "3.7"
+volumes:
+  ydbdir:
+networks:
+  shared-network:
+    driver: bridge
+services:
+  yotta:
+    pid: "host"
+    hostname: "host"
+    networks:
+      - shared-network
+    volumes:
+      - ydbdir:/ydbdir
+    ipc: host
+    image: tnsmith/yottadb-golang:r1.30.0-1.15.6
+  app:
+    restart: always
+    pid: "host"
+    networks:
+      - shared-network
+    hostname: "host"
+    ipc: host
+    image: tnsmith/yotta-test
+    volumes:
+      - ydbdir:/ydbdir
+    environment:
+        - DELAY=2
+    ports:
+      - "127.0.0.1:8010:8010"

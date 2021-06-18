@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  labels:
+    app: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      terminationGracePeriodSeconds: 180
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key:  app-yotta
+                    operator: In
+                    values: ["yes"]
+
+      hostIPC: true
+      hostPID: true
+      hostname: ydbk8snode
+
+      containers:
+        - name: app
+          image: tnsmith/hot-deploy:yotta-test
+          # env: 
+          #   - name: DELAY
+          #     value: "1000"
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /ydbdir
+              name: volumes-app-ydbdir
+            - mountPath: /global
+              name: volumes-app-global
+      volumes:
+        - name: volumes-app-ydbdir
+          hostPath:
+            path: /data/yottadb/ydbdir
+        - name: volumes-app-global
+          hostPath:
+            path: /global
+
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: tnsmith
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  labels:
+    app: app
+spec:
+  ports:
+    - port: 8010
+      targetPort: 8010
+      nodePort: 31000
+      name: app
+
+  type: NodePort
+  selector:
+    app: app
