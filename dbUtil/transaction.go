@@ -17,11 +17,13 @@ func WrapTransaction(ctx context.Context, tpfn func(context.Context, uint64) cEr
 
 	var custErr cErr.Error
 
-	//defer func() {
-	//	if r := recover(); r != nil {
-	//		os.Exit(1)
-	//	}
-	//}()
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("recovery from panic that rethrow from TpE - shut database down and close app")
+			yottadb.Exit()
+			os.Exit(1)
+		}
+	}()
 
 	ytErr := yottadb.TpE(yottadb.NOTTP, &errStr, func(tptoken uint64, errstrp *yottadb.BufferT) (ret int32) {
 
@@ -79,6 +81,7 @@ func WrapTransaction(ctx context.Context, tpfn func(context.Context, uint64) cEr
 
 // Whether to allow certain classes of panics to be treated as a panic or whether it should fail.
 var PermissiveErrorMode bool = true
+
 //var PermissiveErrorMode bool = false
 
 // condition to indicates ydb error
@@ -93,6 +96,7 @@ var nonFatalError = []string{
 	// "runtime error: index out of range",
 	"runtime error: invalid memory address or nil pointer dereference",
 }
+
 // list of Text for fatal synchronous signal panics sent by Go.
 // these panic will cause system to fork process before rethrow the panic
 var fatalSignalText = [...]string{

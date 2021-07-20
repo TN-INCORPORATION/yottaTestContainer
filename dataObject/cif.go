@@ -11,11 +11,11 @@ import (
 const CifGlobal = "^ZCIF"
 
 type CIF struct {
-	ID        int      `json:"id"`
-	Firstname string   `json:"firstname"`
-	Lastname  string   `json:"lastname"`
-	Nickname  string   `json:"nickname,omitempty"`
-	Salary	  int	   `json:"salary,omitempty"`
+	ID        int    `json:"id"`
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Nickname  string `json:"nickname,omitempty"`
+	Salary    int    `json:"salary,omitempty"`
 }
 
 func (c *CIF) Load(tptoken uint64, y YottaCon, id int) cErr.Error {
@@ -46,7 +46,7 @@ func (c *CIF) Load(tptoken uint64, y YottaCon, id int) cErr.Error {
 	c.Firstname = values[0]
 	c.Lastname = values[1]
 	c.Nickname = values[2]
-	c.Salary,_ = strconv.Atoi(values[3])	// ignore error to make it easier
+	c.Salary, _ = strconv.Atoi(values[3]) // ignore error to make it easier
 
 	fmt.Println("Load : ", c.ID, c.Firstname, c.Lastname, c.Nickname, c.Salary)
 	return nil
@@ -99,5 +99,3 @@ func setAccountKey(tptoken uint64, id int, key *yottadb.KeyT, errStr *yottadb.Bu
 	}
 	return nil
 }
-
-

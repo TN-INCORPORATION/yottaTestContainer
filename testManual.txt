@@ -1,0 +1,38 @@
+setup
+- S ^ZNSEQ=0 (run M command)
+- extend record size to 500,000
+- setup delay time (Big, please fill in)
+
+live check
+curl -v http://localhost:8010/
+
+create CIF
+curl -v -d '{"firstname":"Sedtha","lastname":"Jittiarunchai","nickname":"New","salary":10000}' -H 'Content-Type: application/json' http://localhost:8010/cifs
+process
+- get ZNSEQ, +1, use new value as CIF id and save the new value
+- delay between get and set command can be set through configuration file (Big, please fill in)
+- new record will be put in ^ZCIF (no duplicate checking logic)
+- all get, set are running in the same TP
+
+add picture
+curl -v -d '{}' -H 'Content-Type: application/json' http://localhost:8010/pics
+process
+- random picture id [0,1000]
+- use same picture information
+- new record will be put in ^ZPIC. no duplicate checking (its equal to upsert command)
+- set command are running in the same TP
+
+============
+
+fatal test
+
+curl -v http://localhost:8010/fatal/app
+- this will cause arrayIndexOutOfBound without calling any ydb command
+- app should continue
+
+curl -v http://localhost:8010/fatal/ydbcont
+- this will open TP and create nil pointer reference inside TP, this will be treated as "acceptable panic" so the database change will be rolled back and app will be recovered & continue
+
+curl -v http://localhost:8010/fatal/ydbbreak
+- this will open TP and create arrayIndexOutOfBound inside TP, this will be treated as "unacceptable panic" so the database change will not be committed and app must close.
+
