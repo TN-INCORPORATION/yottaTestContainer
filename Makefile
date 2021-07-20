@@ -1,7 +1,7 @@
 build:
-	docker build --force-rm -t tnsmith/yotta-test .
+	docker build --force-rm -t tnsmith/yotta-test:0.0.1 .
 push:
-	docker push tnsmith/yotta-test
+	docker push tnsmith/yotta-test:0.0.1
 start:
 	docker-compose up -d yotta
 	-docker exec --user ydbadm -it trn-micro_yotta_1 bash -c ". /ydbdir/ydbenv && mupip set -rec=500000 -reg DATA" 
